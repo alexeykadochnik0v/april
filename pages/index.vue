@@ -1,10 +1,42 @@
+<!--
+  Главная страница каталога продуктов
+  Отвечает за:
+  1. Отображение списка продуктов
+  2. Поиск и фильтрацию
+  3. Пагинацию
+  4. Переключение вида (сетка/список)
+-->
 <template>
+  <!-- Основной контейнер с максимальной шириной и отступами -->
   <div class="container">
     <h1 class="title">Product Catalog</h1>
+    
+    <!-- 
+      Компонент поиска и переключения вида
+      - v-model для двустороннего связывания поискового запроса
+      - v-model:view-mode для переключения между сеткой и списком
+    -->
     <SearchBar
       v-model="searchQuery"
       v-model:view-mode="viewMode"
     />
+    
+    <!-- 
+      Компонент списка продуктов
+      Пропсы:
+      - products: отфильтрованные и пагинированные продукты
+      - loading: состояние загрузки
+      - error: ошибка, если есть
+      - view-mode: текущий режим отображения (сетка/список)
+      - current-page: текущая страница пагинации
+      - total-pages: общее количество страниц
+      - filtered-total: общее количество отфильтрованных продуктов
+      
+      События:
+      - update:page: смена страницы
+      - open-details: открытие деталей продукта
+      - add-to-cart: добавление в корзину
+    -->
     <ProductList
       :products="paginatedItems"
       :loading="loading"
@@ -21,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+// Импорты из Vue и Nuxt
 import { ref, onMounted } from "vue";
 import { useHead } from "#imports";
 import type { Product } from '~/types'
@@ -30,18 +63,22 @@ import { useSearch } from '~/composables/useSearch'
 import { usePagination } from '~/composables/usePagination'
 import { navigateTo } from '#app'
 
-// SEO
+// SEO-оптимизация
+// Устанавливаем мета-теги для поисковых систем и соцсетей
 useHead({
   title: 'Tech Store | Modern Digital Shopping Experience',
   meta: [
+    // Описание для поисковых систем
     {
       name: 'description',
       content: 'Discover our wide range of digital products. Browse through smartphones, laptops, accessories and more with our easy-to-use search and filtering system.'
     },
+    // Ключевые слова для SEO
     {
       name: 'keywords',
       content: 'tech store, digital products, electronics, smartphones, laptops, online shopping'
     },
+    // Open Graph теги для красивого отображения в соцсетях
     {
       property: 'og:title',
       content: 'Tech Store | Modern Digital Shopping Experience'
@@ -53,18 +90,28 @@ useHead({
   ]
 })
 
-// Состояние
-const viewMode = ref<ViewMode>('grid')
-const loading = ref(false)
-const error = ref<string | null>(null)
-const items = ref<Product[]>([])
+// Состояние компонента
+const viewMode = ref<ViewMode>('grid')    // Режим отображения (сетка/список)
+const loading = ref(false)                // Индикатор загрузки
+const error = ref<string | null>(null)    // Сообщение об ошибке
+const items = ref<Product[]>([])          // Все продукты
 
-// Composables
-const api = useApi()
-const { searchQuery, filteredItems } = useSearch(items)
-const { currentPage, totalPages, paginatedItems, setPage } = usePagination(filteredItems, 9)
+// Подключаем composables
+const api = useApi()                      // API для работы с продуктами
+const { searchQuery, filteredItems } = useSearch(items)  // Поиск по продуктам
+const { 
+  currentPage,                            // Текущая страница
+  totalPages,                             // Всего страниц
+  paginatedItems,                         // Продукты текущей страницы
+  setPage                                 // Метод смены страницы
+} = usePagination(filteredItems, 9)       // 9 продуктов на странице
 
-// Методы
+// Методы компонента
+
+/**
+ * Загружает список продуктов с API
+ * Обрабатывает состояния загрузки и ошибки
+ */
 const fetchProducts = async () => {
   loading.value = true
   error.value = null
@@ -80,43 +127,49 @@ const fetchProducts = async () => {
   }
 }
 
+/**
+ * Открывает страницу с деталями продукта
+ * @param id - ID продукта
+ */
 const openProductDetails = async (id: number) => {
   alert(`Clicked on product ${id}`)
 }
 
+/**
+ * Добавляет продукт в корзину
+ * @param product - Продукт для добавления
+ */
 const addToCart = (product: Product) => {
   alert(`Added ${product.title} to cart`)
 }
 
-// Жизненный цикл
+// Жизненный цикл компонента
 onMounted(() => {
-  fetchProducts()
+  fetchProducts()  // Загружаем продукты при монтировании компонента
 })
 </script>
 
 <style scoped lang="scss">
+// Стили компонента
 .container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  min-height: 100vh;
-  background: #f8f9fa;
+  max-width: 1280px;      // Максимальная ширина контента
+  margin: 0 auto;         // Центрирование
+  padding: 2rem;          // Отступы по краям
   
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 1rem;        // Меньшие отступы на мобильных
   }
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: bold;
   margin-bottom: 2rem;
   text-align: center;
   
   @media (max-width: 768px) {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;    // Меньший размер на мобильных
+    margin-bottom: 1rem;
   }
 }
 </style>

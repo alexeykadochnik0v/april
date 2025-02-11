@@ -1,15 +1,23 @@
+<!-- 
+  ProductList.vue - Компонент для отображения списка продуктов
+  Поддерживает два режима отображения (grid/list), пагинацию и состояния загрузки/ошибки
+-->
 <template>
   <div class="product-list">
+    <!-- Состояние загрузки -->
     <div v-if="loading" class="product-list__loading">
       <div class="loader"></div>
       Loading products...
     </div>
     
+    <!-- Состояние ошибки -->
     <div v-else-if="error" class="product-list__error">
       {{ error }}
     </div>
     
+    <!-- Основной контент -->
     <div v-else>
+      <!-- Сетка продуктов с динамическим классом в зависимости от viewMode -->
       <div :class="['grid', `grid--${viewMode}`]">
         <ProductCard
           v-for="product in products"
@@ -21,15 +29,19 @@
         />
       </div>
       
+      <!-- Сообщение, если продукты не найдены -->
       <div v-if="products.length === 0" class="product-list__empty">
         No products found.
       </div>
       
+      <!-- Блок пагинации -->
       <div v-if="products.length > 0" class="product-list__pagination">
+        <!-- Информация о текущей странице -->
         <div class="product-list__info">
           Showing {{ (currentPage - 1) * 9 + 1 }}-{{ Math.min(currentPage * 9, filteredTotal) }} of {{ filteredTotal }} items
         </div>
         
+        <!-- Контролы пагинации -->
         <div class="product-list__controls">
           <button
             class="btn"
@@ -57,26 +69,29 @@
 </template>
 
 <script setup lang="ts">
-import { Product } from '~/types'
+// Импортируем только тип Product, так как он используется только для типизации
+import type { Product } from '~/types'
 import { watch } from 'vue'
 
+// Определяем интерфейс входных props компонента
 interface Props {
-  products: Product[]
-  loading?: boolean
-  error?: string | null
-  viewMode: 'grid' | 'list'
-  currentPage: number
-  totalPages: number
-  filteredTotal?: number
+  products: Product[]          // Массив продуктов для отображения
+  loading?: boolean           // Флаг загрузки
+  error?: string | null      // Сообщение об ошибке
+  viewMode: 'grid' | 'list'  // Режим отображения (сетка/список)
+  currentPage: number        // Текущая страница
+  totalPages: number         // Общее количество страниц
+  filteredTotal?: number     // Общее количество отфильтрованных элементов
 }
 
+// Устанавливаем props с значениями по умолчанию
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   error: null,
   filteredTotal: 0
 })
 
-// Добавляем отладочный вотчер
+// Отслеживаем изменения в списке продуктов для отладки
 watch(() => props.products, (newProducts) => {
   console.log('ProductList - products changed:', {
     length: newProducts.length,
@@ -89,12 +104,14 @@ watch(() => props.products, (newProducts) => {
   })
 }, { immediate: true })
 
+// Определяем типы событий, которые может испускать компонент
 const emit = defineEmits<{
-  (e: 'update:page', page: number): void
-  (e: 'open-details', id: number): void
-  (e: 'add-to-cart', product: Product): void
+  (e: 'update:page', page: number): void      // Событие изменения страницы
+  (e: 'open-details', id: number): void       // Событие открытия деталей продукта
+  (e: 'add-to-cart', product: Product): void  // Событие добавления в корзину
 }>()
 
+// Обработчики событий
 const openDetails = (id: number) => {
   emit('open-details', id)
 }
@@ -105,7 +122,9 @@ const addToCart = (product: Product) => {
 </script>
 
 <style scoped lang="scss">
+// Стили компонента с использованием BEM методологии
 .product-list {
+  // Общие стили для блоков состояний
   &__loading,
   &__error,
   &__empty {
@@ -117,6 +136,7 @@ const addToCart = (product: Product) => {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
+  // Стили для состояния загрузки
   &__loading {
     .loader {
       display: inline-block;
@@ -130,17 +150,20 @@ const addToCart = (product: Product) => {
     }
   }
   
+  // Стили для состояния ошибки
   &__error {
     color: #e74c3c;
     border: 1px solid rgba(231, 76, 60, 0.2);
     background: rgba(231, 76, 60, 0.05);
   }
   
+  // Стили для пустого состояния
   &__empty {
     font-size: 1.1rem;
     color: #6c757d;
   }
   
+  // Стили для блока пагинации
   &__pagination {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -152,6 +175,7 @@ const addToCart = (product: Product) => {
     align-items: center;
     gap: 1rem;
     
+    // Адаптивная верстка для планшетов и десктопов
     @media (min-width: 768px) {
       flex-direction: row;
       justify-content: space-between;

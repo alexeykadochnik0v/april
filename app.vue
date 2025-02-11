@@ -1,41 +1,59 @@
+<!--
+  app.vue - Корневой компонент приложения Nuxt
+  
+  Особенности:
+  1. <NuxtPage /> - специальный компонент, который отображает текущую страницу
+  2. Здесь определяются глобальные стили и переменные
+  3. Работает как layout по умолчанию для всех страниц
+-->
 <template>
+  <!-- 
+    NuxtPage автоматически рендерит компонент из папки pages/
+    в зависимости от текущего маршрута
+  -->
   <NuxtPage />
 </template>
 
 <style lang="scss">
-// Colors
-$primary-color: #3498db;
-$secondary-color: #2ecc71;
-$text-color: #2c3e50;
-$border-color: #e9ecef;
-$background-color: #f8f9fa;
-$danger-color: #e74c3c;
+// Глобальные переменные SCSS
+// -------------------------
 
-// Spacing
-$spacing-xs: 0.25rem;
-$spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 2rem;
+// Цветовая схема
+$primary-color: #3498db;    // Основной цвет (синий)
+$secondary-color: #2ecc71;  // Дополнительный цвет (зеленый)
+$text-color: #2c3e50;      // Цвет текста
+$border-color: #e9ecef;    // Цвет границ
+$background-color: #f8f9fa; // Цвет фона
+$danger-color: #e74c3c;    // Цвет для ошибок/предупреждений
 
-// Breakpoints
-$breakpoint-sm: 480px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
-$breakpoint-xl: 1280px;
+// Отступы
+$spacing-xs: 0.25rem;  // 4px
+$spacing-sm: 0.5rem;   // 8px
+$spacing-md: 1rem;     // 16px
+$spacing-lg: 1.5rem;   // 24px
+$spacing-xl: 2rem;     // 32px
 
-// Typography
+// Точки перелома для адаптивности
+$breakpoint-sm: 480px;   // Мобильные
+$breakpoint-md: 768px;   // Планшеты
+$breakpoint-lg: 1024px;  // Десктопы
+$breakpoint-xl: 1280px;  // Большие экраны
+
+// Типографика
 $font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-$font-size-base: 1rem;
-$font-size-sm: 0.875rem;
-$font-size-lg: 1.25rem;
+$font-size-base: 1rem;      // 16px
+$font-size-sm: 0.875rem;    // 14px
+$font-size-lg: 1.25rem;     // 20px
 
-// Other
-$border-radius: 8px;
-$box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-$transition-base: all 0.3s ease;
+// Прочие переменные
+$border-radius: 8px;                      // Скругление углов
+$box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Тень
+$transition-base: all 0.3s ease;          // Базовая анимация
 
-// Reset & Base styles
+// Глобальные стили
+// ---------------
+
+// Reset - сброс стандартных стилей
 *,
 *::before,
 *::after {
@@ -44,6 +62,7 @@ $transition-base: all 0.3s ease;
   padding: 0;
 }
 
+// Базовые стили для html и body
 html,
 body {
   height: 100%;
@@ -54,13 +73,14 @@ body {
   background: $background-color;
 }
 
-// Global styles
+// Стили для изображений
 img {
-  max-width: 100%;
+  max-width: 100%;   // Responsive images
   height: auto;
   display: block;
 }
 
+// Стили для кнопок
 button {
   cursor: pointer;
   font-family: inherit;
@@ -73,7 +93,10 @@ button {
   }
 }
 
-// Utility classes
+// Утилитарные классы
+// -----------------
+
+// Контейнер для центрирования и ограничения ширины контента
 .container {
   width: 100%;
   max-width: 1280px;
@@ -81,11 +104,14 @@ button {
   padding: 0 $spacing-md;
   
   @media (max-width: $breakpoint-md) {
-    padding: 0 $spacing-sm;
+    padding: 0 $spacing-sm;  // Меньшие отступы на мобильных
   }
 }
 
-// Animations
+// Анимации
+// --------
+
+// Появление
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -95,6 +121,7 @@ button {
   }
 }
 
+// Появление снизу
 @keyframes slideIn {
   from {
     transform: translateY(20px);

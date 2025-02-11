@@ -1,15 +1,31 @@
+<!-- 
+  ProductCard.vue - Компонент карточки продукта
+  Отображает информацию о продукте в двух режимах: сетка и список
+  Поддерживает адаптивный дизайн и интерактивные действия
+-->
 <template>
+  <!-- Основной контейнер с динамическим классом для режима списка -->
   <div :class="['card', { 'card--list': isList }]" @click="openDetails">
+    <!-- Блок изображения -->
     <div class="card__image">
       <img :src="product.image" :alt="product.title">
     </div>
+    
+    <!-- Основной контент карточки -->
     <div class="card__content">
+      <!-- Заголовок -->
       <h3 class="card__title">{{ product.title }}</h3>
+      
+      <!-- Метаданные (бренд и категория) -->
       <div class="card__meta">
         <span class="card__brand">{{ product.brand }}</span>
         <span class="card__category">{{ product.category }}</span>
       </div>
+      
+      <!-- Описание с автоматическим обрезанием -->
       <p class="card__description">{{ truncatedDescription }}</p>
+      
+      <!-- Детали продукта (рейтинг и наличие) -->
       <div class="card__details">
         <div class="card__rating">
           <span class="card__rating-value">★ {{ product.rating.toFixed(1) }}</span>
@@ -18,8 +34,11 @@
           {{ product.stock }} in stock
         </span>
       </div>
+      
+      <!-- Футер карточки с ценой и кнопкой -->
       <div class="card__footer">
         <span class="card__price">{{ formatPrice(product.price) }}</span>
+        <!-- stop предотвращает всплытие события клика -->
         <button class="btn btn--secondary" @click.stop="addToCart">
           Add to Cart
         </button>
@@ -29,36 +48,43 @@
 </template>
 
 <script setup lang="ts">
+// Интерфейс, описывающий структуру продукта
 interface Product {
-  id: number
-  title: string
-  description: string
-  price: number
-  image: string
-  brand: string
-  category: string
-  rating: number
-  stock: number
+  id: number            // Уникальный идентификатор продукта
+  title: string         // Название продукта
+  description: string   // Полное описание продукта
+  price: number         // Цена продукта (в USD)
+  image: string         // URL изображения продукта
+  brand: string         // Бренд/производитель
+  category: string      // Категория продукта
+  rating: number        // Рейтинг продукта (от 0 до 5)
+  stock: number         // Количество единиц на складе
 }
 
+// Входные параметры компонента
 interface Props {
-  product: Product
-  isList?: boolean
+  product: Product      // Обязательный параметр - объект продукта
+  isList?: boolean      // Опциональный параметр - режим отображения
 }
 
+// Определение props
 const props = defineProps<Props>()
+
+// Определение событий
 const emit = defineEmits<{
-  (e: 'open-details', id: number): void
-  (e: 'add-to-cart', product: Product): void
+  (e: 'open-details', id: number): void       // Событие открытия деталей
+  (e: 'add-to-cart', product: Product): void  // Событие добавления в корзину
 }>()
 
+// Вычисляемое свойство для обрезания описания
 const truncatedDescription = computed(() => {
-  const maxLength = props.isList ? 150 : 100
+  const maxLength = props.isList ? 150 : 100  // Разная длина для разных режимов
   return props.product.description.length > maxLength
     ? `${props.product.description.slice(0, maxLength)}...`
     : props.product.description
 })
 
+// Форматирование цены в USD
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -66,6 +92,7 @@ const formatPrice = (price: number) => {
   }).format(price)
 }
 
+// Обработчики событий
 const openDetails = () => {
   emit('open-details', props.product.id)
 }
@@ -76,6 +103,7 @@ const addToCart = () => {
 </script>
 
 <style scoped lang="scss">
+// Основные стили карточки
 .card {
   background: white;
   border-radius: 12px;
@@ -87,17 +115,19 @@ const addToCart = () => {
   flex-direction: column;
   height: 100%;
   
+  // Эффект при наведении
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   
+  // Модификатор для режима списка
   &--list {
     flex-direction: row;
     height: auto;
     min-height: 200px;
     
-    // Десктоп (больше 1024px)
+    // Адаптивные стили для десктопа
     @media (min-width: 1025px) {
       .card__image {
         width: 300px;
@@ -132,7 +162,7 @@ const addToCart = () => {
       }
     }
     
-    // Планшет (768px - 1024px)
+    // Адаптивные стили для планшета
     @media (min-width: 768px) and (max-width: 1024px) {
       .card__image {
         width: 240px;
@@ -150,7 +180,7 @@ const addToCart = () => {
       }
     }
     
-    // Мобильный (меньше 768px)
+    // Адаптивные стили для мобильных устройств
     @media (max-width: 767px) {
       flex-direction: row;
       min-height: 120px;
@@ -187,7 +217,7 @@ const addToCart = () => {
       }
       
       .card__description {
-        display: none;
+        display: none;  // Скрываем описание на мобильных
       }
       
       .card__details {
